@@ -1,1 +1,5 @@
 main
+main.s
+main.mir
+main.ll
+*~
