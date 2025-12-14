@@ -1,14 +1,25 @@
-#![no_main]
 use std::marker::PhantomData;
 
+fn main() { test() }
+
 #[no_mangle]
-pub fn main() {
+#[inline(never)]
+pub fn side_effect(i: u32) {
+    println!("{i}");
+}
+
+#[no_mangle]
+#[inline(never)]
+pub fn test() {
     macro_rules! succ {
         ($n:ty) => {<$n as Nat>::Next};
     }
-    std::hint::black_box(<
+    let (_, _result) = std::hint::black_box(<
         succ!(succ!(succ!(succ!(Zero))))
-    >::repeat(&|x| x + 1, 0));
+    >::repeat(|x| {
+        side_effect(x);
+        x * x
+    }, 2 * 2));
 }
 
 trait Nat: Sized {
